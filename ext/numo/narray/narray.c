@@ -6,6 +6,9 @@
 #define NARRAY_C
 #include <ruby.h>
 #include <assert.h>
+#ifdef TRUFFLERUBY
+#include <truffle.h>
+#endif
 
 /* global variables within this module */
 VALUE numo_cNArray;
@@ -934,19 +937,27 @@ na_index_arg_to_internal_order(int argc, VALUE *argv, VALUE self)
     }
 }
 
-void
-na_copy_flags(VALUE src, VALUE dst)
+
+void na_copy_flags(VALUE src, VALUE dst)
 {
     narray_t *na1, *na2;
-
-    GetNArray(src,na1);
-    GetNArray(dst,na2);
+    GetNArray(src, na1);
+    GetNArray(dst, na2);
 
     na2->flag[0] = na1->flag[0];
     //na2->flag[1] = NA_FL1_INIT;
 
+#ifdef TRUFFLERUBY
+    // TruffleRuby-specific code
+    VALUE src_flags = rb_obj_read_flags(src);
+    VALUE dst_flags = rb_obj_read_flags(dst);
+    VALUE new_flags = dst_flags | (src_flags & (FL_USER1|FL_USER2|FL_USER3|FL_USER4|FL_USER5|FL_USER6|FL_USER7));
+    rb_obj_write_flags(dst, new_flags);
+#else
+    // Original code for other Ruby implementations
     RBASIC(dst)->flags |= (RBASIC(src)->flags) &
         (FL_USER1|FL_USER2|FL_USER3|FL_USER4|FL_USER5|FL_USER6|FL_USER7);
+#endif
 }
 
 
