@@ -942,18 +942,18 @@ na_index_arg_to_internal_order(int argc, VALUE *argv, VALUE self)
 void na_copy_flags(VALUE src, VALUE dst)
 {
     narray_t *na1, *na2;
-    GetNArray(src, na1);
-    GetNArray(dst, na2);
+    GetNArray(src,na1);
+    GetNArray(dst,na2);
 
     na2->flag[0] = na1->flag[0];
     //na2->flag[1] = NA_FL1_INIT;
 
 #ifdef TRUFFLERUBY
     // TruffleRuby-specific code
-    unsigned long src_flags = rb_obj_flags(src);
-    unsigned long dst_flags = rb_obj_flags(dst);
+    unsigned long src_flags = RBASIC(src)->flags;
+    unsigned long dst_flags = RBASIC(dst)->flags;
     unsigned long new_flags = dst_flags | (src_flags & (FL_USER1|FL_USER2|FL_USER3|FL_USER4|FL_USER5|FL_USER6|FL_USER7));
-    rb_obj_set_flags(dst, new_flags);
+    rb_tr_set_flags(dst, new_flags);
 #else
     // Original code for other Ruby implementations
     RBASIC(dst)->flags |= (RBASIC(src)->flags) &
