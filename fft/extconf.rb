@@ -5,6 +5,7 @@ require 'rbconfig.rb'
 require 'mkmf'
 
 # $CFLAGS="-O0"
+$CFLAGS << " -Wall -Wno-implicit-function-declaration -Wno-error"
 $INCFLAGS = "-I../ext -I../ext/types #$INCFLAGS"
 
 srcs = %w(
