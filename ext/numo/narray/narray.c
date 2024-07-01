@@ -7,7 +7,8 @@
 #include <ruby.h>
 #include <assert.h>
 #ifdef TRUFFLERUBY
-#include <truffle.h>
+#include <ruby.h>
+#define TRUFFLERUBY_NARRAY_FALLBACK
 #endif
 
 /* global variables within this module */
@@ -947,12 +948,12 @@ void na_copy_flags(VALUE src, VALUE dst)
     na2->flag[0] = na1->flag[0];
     //na2->flag[1] = NA_FL1_INIT;
 
-#ifdef TRUFFLERUBY
-    // TruffleRuby-specific code
-    VALUE src_flags = rb_obj_read_flags(src);
-    VALUE dst_flags = rb_obj_read_flags(dst);
+#ifdef TRUFFLERUBY_NARRAY_FALLBACK
+    // TruffleRuby fallback code
+    VALUE src_flags = rb_obj_flags(src);
+    VALUE dst_flags = rb_obj_flags(dst);
     VALUE new_flags = dst_flags | (src_flags & (FL_USER1|FL_USER2|FL_USER3|FL_USER4|FL_USER5|FL_USER6|FL_USER7));
-    rb_obj_write_flags(dst, new_flags);
+    rb_obj_set_flags(dst, new_flags);
 #else
     // Original code for other Ruby implementations
     RBASIC(dst)->flags |= (RBASIC(src)->flags) &
