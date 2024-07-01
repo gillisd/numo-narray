@@ -950,10 +950,10 @@ void na_copy_flags(VALUE src, VALUE dst)
 
 #ifdef TRUFFLERUBY
     // TruffleRuby-specific code
-    VALUE src_flags = rb_obj_class(src); // Use this to get the object without triggering any conversions
-    VALUE dst_flags = rb_obj_class(dst);
-    unsigned long new_flags = (rb_tr_obj_flags(dst_flags) | (rb_tr_obj_flags(src_flags) & (FL_USER1|FL_USER2|FL_USER3|FL_USER4|FL_USER5|FL_USER6|FL_USER7)));
-    rb_tr_obj_set_flags(dst, new_flags);
+    unsigned long src_flags = RBASIC(src)->flags;
+    unsigned long dst_flags = RBASIC(dst)->flags;
+    unsigned long new_flags = dst_flags | (src_flags & (FL_USER1|FL_USER2|FL_USER3|FL_USER4|FL_USER5|FL_USER6|FL_USER7));
+    rb_tr_set_flags(dst, new_flags);
 #else
     // Original code for other Ruby implementations
     RBASIC(dst)->flags |= (RBASIC(src)->flags) &
