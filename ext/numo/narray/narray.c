@@ -950,17 +950,16 @@ void na_copy_flags(VALUE src, VALUE dst)
 
 #ifdef TRUFFLERUBY
     // TruffleRuby-specific code
-    unsigned long src_flags = RBASIC(src)->flags;
-    unsigned long dst_flags = RBASIC(dst)->flags;
+    unsigned long src_flags = rb_obj_flags(src);
+    unsigned long dst_flags = rb_obj_flags(dst);
     unsigned long new_flags = dst_flags | (src_flags & (FL_USER1|FL_USER2|FL_USER3|FL_USER4|FL_USER5|FL_USER6|FL_USER7));
-    rb_tr_set_flags(dst, new_flags);
+    rb_obj_set_flags(dst, new_flags);
 #else
     // Original code for other Ruby implementations
     RBASIC(dst)->flags |= (RBASIC(src)->flags) &
         (FL_USER1|FL_USER2|FL_USER3|FL_USER4|FL_USER5|FL_USER6|FL_USER7);
 #endif
 }
-
 
 // fix name, ex, allow_stride_for_flatten_view
 VALUE
